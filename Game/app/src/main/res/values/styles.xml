@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="LoseToast">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">100dp</item>
+        <item name="android:background">@color/backgroundRed</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">50sp</item>
+        <item name="android:text">@string/lose_toast</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="WinToast">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">100dp</item>
+        <item name="android:background">@color/backgroundGreen</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">50sp</item>
+        <item name="android:text">@string/win_toast</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="DrawToast">
+        <item name="android:layout_width">100dp</item>
+        <item name="android:layout_height">100dp</item>
+        <item name="android:background">@color/backgroundToastYellow</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">50sp</item>
+        <item name="android:text">@string/draw_toast</item>
+        <item name="android:gravity">center</item>
+    </style>
+</resources>

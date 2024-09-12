@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Game</string>
+    <string name="cancel_button_description">Выйти</string>
+    <string name="settings_button_description">Настройки</string>
+    <string name="textMaxScore">5</string>
+    <string name="enemyTextScore">1</string>
+    <string name="separatorTextScore">:</string>
+    <string name="userTextScore">2</string>
+    <string name="user_Text_Rock_description">Камень</string>
+    <string name="user_Text_Scissors_description">Ножницы</string>
+    <string name="user_Text_Paper_description">Бумага</string>
+    <string name="lose_toast">Вы проиграли</string>
+    <string name="win_toast">Вы выиграли</string>
+    <string name="draw_toast">Ничья</string>
+    <string name="cancel_settings_button_description">Отмена</string>
+    <string name="ok_settings_button_description">Подтвердить</string>
+</resources>

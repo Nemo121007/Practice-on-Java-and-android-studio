@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">converter</string>
+    <string name="reverce_button_description">Поменять местами валюты</string>
+    <string name="enter_summ_description">Введите сумму</string>
+</resources>
