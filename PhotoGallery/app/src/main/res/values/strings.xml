@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PhotoGallery</string>
+    <string name="cancel_button_descryption">Выход</string>
+    <string name="search_button_descryption">Поиск</string>
+    <string name="name">Название</string>
+    <string name="tags">Теги</string>
+    <string name="descpyption">Описание</string>
+</resources>
