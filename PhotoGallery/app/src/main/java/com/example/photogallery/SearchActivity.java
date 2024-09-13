@@ -3,19 +3,14 @@ package com.example.photogallery;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.chip.ChipGroup;
 
 public class SearchActivity extends AppCompatActivity {
-    ImageButton cancelButton, searchButton;
+    ImageButton cameraButton, searchButton;
     EditText editNameFieldText, editTextFieldDescryption;
     ChipGroup tagContainer;
     TextView textNameViev, textTagViev, textDescryptionViev;
@@ -30,7 +25,7 @@ public class SearchActivity extends AppCompatActivity {
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
 //            return insets;
 //        });
-        cancelButton = findViewById(R.id.imageCancelButton);
+        cameraButton = findViewById(R.id.imageCameraButton);
         searchButton = findViewById(R.id.imageSearchButton);
         editNameFieldText = findViewById(R.id.editNameFieldText);
         editTextFieldDescryption = findViewById(R.id.editDescryptionFieldText);

@@ -1,6 +1,5 @@
 package com.example.photogallery;
 
-import android.media.Image;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -15,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.chip.ChipGroup;
 
 public class PhotoActivity extends AppCompatActivity {
-    ImageButton cancelButton, searchButton;
+    ImageButton cameraButton, searchButton;
     ImageView image;
     EditText editNameText, editTextDescryption;
     ChipGroup tagContainer;
@@ -31,7 +30,7 @@ public class PhotoActivity extends AppCompatActivity {
             return insets;
         });
 
-        cancelButton = findViewById(R.id.imageCancelButton);
+        cameraButton = findViewById(R.id.imageCameraButton);
         searchButton = findViewById(R.id.imageSearchButton);
         image = findViewById(R.id.imagePhotoView);
         editNameText = findViewById(R.id.editNameText);

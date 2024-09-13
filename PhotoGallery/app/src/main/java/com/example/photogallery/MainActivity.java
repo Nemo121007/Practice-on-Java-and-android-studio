@@ -3,15 +3,16 @@ package com.example.photogallery;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import Photo.PhotoCollection;
+import Photo.Photo;
+import Photo.PhotoAdapter;
+
 public class MainActivity extends AppCompatActivity {
-    ImageButton cancelButton, searchButton;
+    ImageButton cameraButton, searchButton;
     RecyclerView recyclerView;
 
     @Override
@@ -25,9 +26,32 @@ public class MainActivity extends AppCompatActivity {
 //            return insets;
 //        });
 
-        cancelButton = findViewById(R.id.imageCancelButton);
+        cameraButton = findViewById(R.id.imageCameraButton);
         searchButton = findViewById(R.id.imageSearchButton);
 
         recyclerView = findViewById(R.id.recyclerView);
+
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 5));
+
+        Photo photo = new Photo("test.png");
+        PhotoCollection photoCollection = new PhotoCollection();
+        for (Integer i = 0; i < 20; i++){
+            photoCollection.addPhoto(photo);
+        }
+        photoCollection.WritePhotoCollection(this);
+        PhotoCollection a = PhotoCollection.ReadPhotoCollection(this);
+
+        PhotoAdapter adapter = new PhotoAdapter(photoCollection.getPhotoCollection()); // photos - список ваших фотографий
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void testPhoto(){
+        Photo photo = new Photo("test.png");
+        PhotoCollection photoCollection = new PhotoCollection();
+        for (Integer i = 0; i < 20; i++){
+            photoCollection.addPhoto(photo);
+        }
+        photoCollection.WritePhotoCollection(this);
+        PhotoCollection a = PhotoCollection.ReadPhotoCollection(this);
     }
 }
