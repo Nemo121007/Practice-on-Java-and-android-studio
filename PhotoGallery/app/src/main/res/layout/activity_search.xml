@@ -19,13 +19,13 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/imageCameraButton"
+            android:id="@+id/imageBackButton"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:background="@color/background"
             android:contentDescription="@string/cancel_button_descryption"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/camera" />
+            app:srcCompat="@drawable/back" />
 
         <Space
             android:layout_width="0dp"
@@ -33,13 +33,13 @@
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/imageSearchButton"
+            android:id="@+id/imageOkButton"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:background="@color/background"
             android:contentDescription="@string/search_button_descryption"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/search" />
+            app:srcCompat="@drawable/ok" />
 
     </LinearLayout>
 
@@ -64,10 +64,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:autofillHints=""
             android:ems="10"
             android:inputType="text"
-            android:text="Name"
-            android:textSize="20sp" />
+            android:text="@string/name"
+            android:textSize="20sp"
+            tools:ignore="LabelFor" />
 
     </LinearLayout>
 
@@ -110,7 +112,7 @@
             android:id="@+id/textDescryptionView"
             android:layout_width="100dp"
             android:layout_height="match_parent"
-            android:text="@string/descpyption"
+            android:text="@string/descryption"
             android:textSize="20sp" />
 
         <EditText
@@ -118,11 +120,13 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:autofillHints=""
             android:ems="10"
             android:gravity="top"
             android:inputType="text"
-            android:text="Name"
-            android:textSize="20sp" />
+            android:text="@string/name"
+            android:textSize="20sp"
+            tools:ignore="LabelFor" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

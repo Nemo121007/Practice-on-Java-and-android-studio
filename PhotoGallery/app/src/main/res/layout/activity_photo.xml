@@ -19,13 +19,13 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/imageCameraButton"
+            android:id="@+id/imageBackButton"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:background="@color/background"
             android:contentDescription="@string/cancel_button_descryption"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/camera" />
+            app:srcCompat="@drawable/back" />
 
         <Space
             android:layout_width="0dp"
@@ -33,13 +33,13 @@
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/imageSearchButton"
+            android:id="@+id/imageDeleteButton"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:background="@color/background"
-            android:contentDescription="@string/search_button_descryption"
+            android:contentDescription="@string/delete"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/search" />
+            app:srcCompat="@drawable/basket" />
 
     </LinearLayout>
 
@@ -48,6 +48,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/image"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/editNameText"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,12 +61,14 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        android:autofillHints=""
         android:ems="10"
         android:inputType="text"
-        android:text="Name"
+        android:hint="@string/name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imagePhotoView" />
+        app:layout_constraintTop_toBottomOf="@+id/imagePhotoView"
+        tools:ignore="LabelFor" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/tagContainer"
@@ -82,13 +85,15 @@
         android:layout_height="100dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="40dp"
+        android:autofillHints=""
         android:ems="10"
         android:gravity="top"
         android:inputType="text"
-        android:text="Name"
+        android:hint="@string/descryption"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tagContainer" />
+        app:layout_constraintTop_toBottomOf="@+id/tagContainer"
+        tools:ignore="LabelFor" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

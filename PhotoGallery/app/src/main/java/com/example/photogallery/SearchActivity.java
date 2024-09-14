@@ -10,29 +10,33 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.chip.ChipGroup;
 
 public class SearchActivity extends AppCompatActivity {
-    ImageButton cameraButton, searchButton;
+    ImageButton imageBackButton, imageOkButton;
     EditText editNameFieldText, editTextFieldDescryption;
     ChipGroup tagContainer;
-    TextView textNameViev, textTagViev, textDescryptionViev;
+    TextView textNameView, textTagView, textDescryptionView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_search);
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-//            return insets;
-//        });
-        cameraButton = findViewById(R.id.imageCameraButton);
-        searchButton = findViewById(R.id.imageSearchButton);
+
+        imageBackButton = findViewById(R.id.imageBackButton);
+        imageOkButton = findViewById(R.id.imageOkButton);
         editNameFieldText = findViewById(R.id.editNameFieldText);
         editTextFieldDescryption = findViewById(R.id.editDescryptionFieldText);
         tagContainer = findViewById(R.id.tagContainer);
-        textNameViev = findViewById(R.id.textNameView);
-        textDescryptionViev = findViewById(R.id.textTagView);
-        textDescryptionViev = findViewById(R.id.textDescryptionView);
+        textNameView = findViewById(R.id.textNameView);
+        textTagView = findViewById(R.id.textTagView);
+        textDescryptionView = findViewById(R.id.textDescryptionView);
+
+        imageBackButton.setOnClickListener(v -> {
+            finish();
+        });
+
+        imageOkButton.setOnClickListener(v -> {
+            // TODO: Обработать сохранение
+            finish();
+        });
 
     }
 }

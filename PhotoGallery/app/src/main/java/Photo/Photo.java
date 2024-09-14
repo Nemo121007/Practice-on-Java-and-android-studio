@@ -4,14 +4,13 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-public class Photo {
+public class Photo implements Serializable {
     @Expose
     private String Id;
     @Expose
@@ -20,21 +19,12 @@ public class Photo {
     private String Description;
     @Expose
     private Set<String> Tags;
-    private String Expansion;
 
-    public Photo(@NonNull String name) {
-        Id = Integer.valueOf(name.hashCode()).toString();
+    public Photo(@NonNull String id) {
+        Id = id;
+        Name = "";
         Description = "";
-        Expansion = name;
         Tags = new HashSet<>();
-        int dotIndex = name.indexOf('.');
-        if (dotIndex != -1) {
-            Name = name.substring(0, dotIndex);
-            Expansion = name.substring(dotIndex, name.length());
-        } else {
-            Name = name;
-            Expansion = ""; // Или другое значение по умолчанию, если нет точки
-        }
     }
 
     public String getId() {
@@ -46,14 +36,14 @@ public class Photo {
     }
 
     public String getPath(){
-        return Name + Expansion;
+        return getId();
     }
 
     public void setName(String name) {
         Name = name;
     }
 
-    public String getDescription() {
+    public String getDescryption() {
         return Description;
     }
 

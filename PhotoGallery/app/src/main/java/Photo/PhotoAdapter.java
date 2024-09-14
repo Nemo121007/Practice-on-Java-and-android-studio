@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
 
     private List<Photo> photos;
+    private OnItemClickListener listener;
 
     public PhotoAdapter(List<Photo> photosList) {
         if (photosList != null){
@@ -55,10 +56,20 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
                 .placeholder(R.drawable.question)
                 .error(R.drawable.question)
                 .into(holder.imageView);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(position);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return photos.size();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 }

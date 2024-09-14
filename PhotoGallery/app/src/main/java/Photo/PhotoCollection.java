@@ -13,15 +13,24 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-public class PhotoCollection {
+import kotlin.jvm.Transient;
+
+public class PhotoCollection implements Serializable {
     @Expose
-    private Map<String, Photo> photos;
+    private LinkedHashMap<String, Photo> photos;
+
+    @Transient // Исключаем из сериализации
+    private List<String> listPhotoId;
+    @Transient
+    private Integer index;
 
     public PhotoCollection() {
         photos = new LinkedHashMap<>();
@@ -41,23 +50,24 @@ public class PhotoCollection {
     {
         if (!photos.containsKey(photo.getId())){
             photos.put(photo.getId(), photo);
-        } else {
-            String newId = Integer.valueOf(photo.getId().hashCode()).toString();
-            while (photos.containsKey(newId)){
-                newId = Integer.valueOf(newId.hashCode()).toString();
-            }
-
-            // Рефлексия типов!!!
-            try {
-                Field idField = Photo.class.getDeclaredField("Id");
-                idField.setAccessible(true);
-                idField.set(photo, newId);
-                photos.put(newId, photo);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-                // Обработка ошибок
-            }
         }
+//        else {
+//            String newId = Integer.valueOf(photo.getId().hashCode()).toString();
+//            while (photos.containsKey(newId)){
+//                newId = Integer.valueOf(newId.hashCode()).toString();
+//            }
+//
+//            // Рефлексия типов!!!
+//            try {
+//                Field idField = Photo.class.getDeclaredField("Id");
+//                idField.setAccessible(true);
+//                idField.set(photo, newId);
+//                photos.put(newId, photo);
+//            } catch (NoSuchFieldException | IllegalAccessException e) {
+//                e.printStackTrace();
+//                // Обработка ошибок
+//            }
+//        }
     }
 
     public void addPhotos(@NonNull Photo ... photos)
@@ -86,8 +96,19 @@ public class PhotoCollection {
         photos.remove(photoId);
     }
 
+    public void clear(){
+        photos.clear();
+    }
+
     public List<Photo> getPhotoCollection() {
         return new ArrayList<>(photos.values());
+    }
+
+    public Photo getPhotoFromId(String id) {
+        if (!photos.containsKey(id)){
+            return null;
+        }
+        return photos.get(id);
     }
 
     public List<Photo> getPhotoFromName(String name) {
@@ -103,7 +124,7 @@ public class PhotoCollection {
     public List<Photo> getPhotoFromDescryption(String descryption) {
         List<Photo> result = new ArrayList<>();
         for (Photo photo : photos.values()) {
-            if (photo.getDescription().contains(descryption)) {
+            if (photo.getDescryption().contains(descryption)) {
                 result.add(photo);
             }
         }
@@ -118,6 +139,40 @@ public class PhotoCollection {
             }
         }
         return result;
+    }
+
+    public Photo next() {
+        if (listPhotoId.equals(null)){
+            listPhotoId = new ArrayList<>(photos.keySet());
+            index = 0;
+        }
+        else {
+            if (index == listPhotoId.size()){
+                index = 0;
+            }
+            else {
+                index++;
+            }
+            return photos.get(listPhotoId.get(index));
+        }
+        return null;
+    }
+
+    public Photo past(){
+        if (listPhotoId.equals(null)){
+            listPhotoId = new ArrayList<>(photos.keySet());
+            index = 0;
+        }
+        else {
+            if (index == -1){
+                index = listPhotoId.size() - 1;
+            }
+            else {
+                index--;
+            }
+            return photos.get(listPhotoId.get(index));
+        }
+        return null;
     }
 
     public void WritePhotoCollection(@NonNull Context context) {
@@ -138,16 +193,30 @@ public class PhotoCollection {
         File internalStorageDir = context.getFilesDir();
         File myFile = new File(internalStorageDir, "dataPhotoCollection.json");
 
-        PhotoCollection photoCollection;
+        PhotoCollection photoCollection = null; // Инициализируем null
         try (FileReader reader = new FileReader(myFile)) {
             Gson gson = new Gson();
             photoCollection = gson.fromJson(reader, PhotoCollection.class);
         } catch (IOException e) {
             e.printStackTrace();
-            return null; // Или обработайте ошибку другим способом
+            return null;
         }
 
-        photoCollection.ReadFileOnDevice();
+        if (photoCollection != null) {
+            List<Photo> photos = photoCollection.getPhotoCollection(); // Получаем список фотографий
+            Iterator<Photo> iterator = photos.iterator();
+            while (iterator.hasNext()) {
+                Photo photo = iterator.next();
+                // TODO: Удаляет записанные файлы
+                File file = new File(context.getExternalFilesDir(null), photo.getPath()); // Используем context
+                if (!file.exists()) {
+                    iterator.remove(); // Безопасное удаление с помощью итератора
+                }
+            }
+
+            photoCollection.ReadFileOnDevice();
+        }
+
         return photoCollection;
     }
 
@@ -160,10 +229,13 @@ public class PhotoCollection {
 
             if (imageFiles != null && imageFiles.length > 0) {
 
-                // Добавьте все пути к изображениям в список
+                // Добавbnm все пути к файлам в список, если они еще не добавлены
                 for (File imageFile : imageFiles) {
-                    String path = imageFile.getAbsolutePath();
-                    this.addPhoto(new Photo(path));
+                    String path = imageFile.getAbsolutePath().toString();
+                    if (this.getPhotoFromId(path) == null) {
+                        // Если файл еще не добавлен, добавьте его в список
+                        this.addPhoto(new Photo(path));
+                    }
                 }
             }
         }

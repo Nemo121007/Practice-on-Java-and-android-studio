@@ -4,5 +4,7 @@
     <string name="search_button_descryption">Поиск</string>
     <string name="name">Название</string>
     <string name="tags">Теги</string>
-    <string name="descpyption">Описание</string>
+    <string name="descryption">Описание</string>
+    <string name="delete">Удалить</string>
+    <string name="image">Изображение</string>
 </resources>
