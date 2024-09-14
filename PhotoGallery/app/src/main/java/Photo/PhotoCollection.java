@@ -1,6 +1,7 @@
 package Photo;
 
 import android.content.Context;
+import android.os.Environment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -137,12 +138,37 @@ public class PhotoCollection {
         File internalStorageDir = context.getFilesDir();
         File myFile = new File(internalStorageDir, "dataPhotoCollection.json");
 
+        PhotoCollection photoCollection;
         try (FileReader reader = new FileReader(myFile)) {
             Gson gson = new Gson();
-            return gson.fromJson(reader, PhotoCollection.class);
+            photoCollection = gson.fromJson(reader, PhotoCollection.class);
         } catch (IOException e) {
             e.printStackTrace();
             return null; // Или обработайте ошибку другим способом
+        }
+
+        photoCollection.ReadFileOnDevice();
+        return photoCollection;
+    }
+
+    public void ReadFileOnDevice(){
+        File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File photoGalleryDir = new File(picturesDir, "PhotoGallery");
+
+        if (photoGalleryDir.exists() && photoGalleryDir.isDirectory()) {
+            File[] imageFiles = photoGalleryDir.listFiles();
+
+            if (imageFiles != null && imageFiles.length > 0) {
+
+                // Добавьте все пути к изображениям в список
+                for (File imageFile : imageFiles) {
+                    String path = imageFile.getAbsolutePath();
+                    this.addPhoto(new Photo(path));
+                }
+            }
+        }
+        if (!photoGalleryDir.exists()) {
+            boolean success = photoGalleryDir.mkdirs();
         }
     }
 }

@@ -8,7 +8,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.photogallery"
-        minSdk 24
+        minSdk 30
+        minSdkVersion 30
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -38,4 +39,6 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.gson
+    implementation libs.glide
+    annotationProcessor libs.compiler
 }

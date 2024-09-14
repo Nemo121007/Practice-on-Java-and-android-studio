@@ -1,5 +1,6 @@
 package Photo;
 
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +11,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.photogallery.R;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import com.bumptech.glide.Glide;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
 
     private List<Photo> photos;
 
-    public PhotoAdapter(List<Photo> photos) {
-        this.photos = photos;
+    public PhotoAdapter(List<Photo> photosList) {
+        if (photosList != null){
+            this.photos = photosList;
+        }
+        else {
+            this.photos = new ArrayList<>();
+        }
     }
 
     public static class PhotoViewHolder extends RecyclerView.ViewHolder {
@@ -38,9 +47,14 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PhotoViewHolder holder, int position) {
+    public void onBindViewHolder(PhotoViewHolder holder, int position) {
         Photo photo = photos.get(position);
-        // Загрузите фото в holder.imageView с помощью Glide, Picasso или другой библиотеки
+        String path = photo.getPath();
+        Glide.with(holder.itemView.getContext())
+                .load(path)
+                .placeholder(R.drawable.question)
+                .error(R.drawable.question)
+                .into(holder.imageView);
     }
 
     @Override

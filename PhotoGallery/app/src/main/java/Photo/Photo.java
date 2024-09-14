@@ -30,7 +30,7 @@ public class Photo {
         int dotIndex = name.indexOf('.');
         if (dotIndex != -1) {
             Name = name.substring(0, dotIndex);
-            Expansion = ".*";
+            Expansion = name.substring(dotIndex, name.length());
         } else {
             Name = name;
             Expansion = ""; // Или другое значение по умолчанию, если нет точки
@@ -43,6 +43,10 @@ public class Photo {
 
     public String getName() {
         return Name;
+    }
+
+    public String getPath(){
+        return Name + Expansion;
     }
 
     public void setName(String name) {
