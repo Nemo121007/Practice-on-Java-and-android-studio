@@ -9,4 +9,5 @@
     <color name="backgroundToastYellow">#ddf540</color>
     <color name="green">#0f0</color>
     <color name="red">#f00</color>
+    <color name="chip_green">#33e839</color>
 </resources>

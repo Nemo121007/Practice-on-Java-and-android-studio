@@ -7,4 +7,8 @@
     <string name="descryption">Описание</string>
     <string name="delete">Удалить</string>
     <string name="image">Изображение</string>
+    <string name="tag">Тэг</string>
+    <string name="new_tag">Добавить новый тег</string>
+    <string name="past">Прошлый</string>
+    <string name="next">Слудующий</string>
 </resources>

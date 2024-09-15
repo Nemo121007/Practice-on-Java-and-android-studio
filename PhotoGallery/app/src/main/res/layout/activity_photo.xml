@@ -50,34 +50,78 @@
         android:layout_marginTop="8dp"
         android:contentDescription="@string/image"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/editNameText"
+        app:layout_constraintBottom_toTopOf="@+id/NameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/UpLayout"
         tools:srcCompat="@tools:sample/avatars" />
 
-    <EditText
-        android:id="@+id/editNameText"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/NameLayout"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:inputType="text"
-        android:hint="@string/name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imagePhotoView"
-        tools:ignore="LabelFor" />
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/imagePhotoView">
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/tagContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
+        <ImageButton
+            android:id="@+id/imageButtonPast"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@color/background"
+            android:contentDescription="@string/past"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/back" />
+
+        <EditText
+            android:id="@+id/editNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:autofillHints=""
+            android:ems="10"
+            android:hint="@string/name"
+            android:inputType="text"
+            tools:ignore="LabelFor" />
+
+        <ImageButton
+            android:id="@+id/imageButtonNext"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@color/background"
+            android:contentDescription="@string/next"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/next" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/TagLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editNameText" />
+        app:layout_constraintTop_toBottomOf="@+id/NameLayout">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/tagContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/plusButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/plusButton"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:background="@color/background"
+            android:contentDescription="@string/new_tag"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/plus" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
         android:id="@+id/editDescryptionText"
@@ -93,7 +137,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tagContainer"
+        app:layout_constraintTop_toBottomOf="@+id/TagLayout"
         tools:ignore="LabelFor" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
