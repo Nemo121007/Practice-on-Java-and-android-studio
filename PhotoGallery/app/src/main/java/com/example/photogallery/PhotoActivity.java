@@ -25,7 +25,7 @@ public class PhotoActivity extends AppCompatActivity {
     EditText editNameText, editTextDescryption;
     ChipGroup tagContainer;
     Photo photo;
-    PhotoCollection photoCollection;
+    PhotoCollection photoCollection = MainActivity.getPhotoCollection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +52,10 @@ public class PhotoActivity extends AppCompatActivity {
         });
         // endregion
 
-        photo = (Photo) getIntent().getSerializableExtra("photo");
-        photoCollection = (PhotoCollection) getIntent().getSerializableExtra("photoCollection");
-        // Получите путь к изображению из вашего объекта Photo
-        assert photo != null;
-        String imagePath = photo.getPath();
+        photo = photoCollection.getPhotoFromId((String) getIntent().getSerializableExtra("photoId"));
 
         // Создайте URI из пути к файлу
-        File imageFile = new File(imagePath);
+        File imageFile = new File(MainActivity.getPhotoGalleryDir(), photo.getId());
         Uri imageUri = Uri.fromFile(imageFile);
 
         // Загрузите изображение в ImageView с помощью Glide
@@ -71,6 +67,9 @@ public class PhotoActivity extends AppCompatActivity {
 
         GestureDetector gestureDetector = new GestureDetector(this, new MyGestureListener());
         image.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+
+        editNameText.setText(photo.getName());
+        editTextDescryption.setText(photo.getDescryption());
     }
 
     private void showPreviousData() {
@@ -118,10 +117,12 @@ public class PhotoActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
          if (!photo.getName().equals(editNameText.getText().toString())){
-             MainActivity.updatePhoto(photo.getId(), editNameText.getText().toString());
+             MainActivity.updatePhoto(photo.getId(), editNameText.getText().toString(), null, null);
         }
         if (!photo.getDescryption().equals(editTextDescryption.getText().toString())){
-            MainActivity.updatePhoto(photo.getId(), null, editTextDescryption.getText().toString());
+            MainActivity.updatePhoto(photo.getId(), null, editTextDescryption.getText().toString(), null);
         }
+
+        photoCollection.WritePhotoCollection(this);
     }
 }

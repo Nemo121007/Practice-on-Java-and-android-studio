@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.photogallery.MainActivity;
 import com.example.photogallery.R;
 
 import java.io.File;
@@ -50,7 +51,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     @Override
     public void onBindViewHolder(PhotoViewHolder holder, int position) {
         Photo photo = photos.get(position);
-        String path = photo.getPath();
+        String path = new File(MainActivity.getPhotoGalleryDir(), photo.getId()).getAbsolutePath();
         Glide.with(holder.itemView.getContext())
                 .load(path)
                 .placeholder(R.drawable.question)

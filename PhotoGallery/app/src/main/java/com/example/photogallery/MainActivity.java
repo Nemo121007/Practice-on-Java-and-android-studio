@@ -1,5 +1,6 @@
 package com.example.photogallery;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -21,12 +22,15 @@ import Photo.PhotoAdapter;
 import Photo.Photo;
 import android.Manifest;
 
+import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     ImageButton cameraButton, searchButton;
     RecyclerView recyclerView;
     private static PhotoCollection photos;
+    private static File photoGalleryDir = new File(Environment
+            .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "PhotoGallery");
 
     private static final int REQUEST_CODE = 1; // Код запроса для READ_EXTERNAL_STORAGE
     private static final int REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 2; // Код запроса для MANAGE_EXTERNAL_STORAGE
@@ -80,8 +84,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(position -> {
             Photo photo = photos.getPhotoCollection().get(position);
             Intent intent = new Intent(MainActivity.this, PhotoActivity.class);
-            intent.putExtra("photo", photo);
-            intent.putExtra("photoCollection", photos);
+            intent.putExtra("photoId", photo.getId());
             startActivity(intent);
         });
 
@@ -98,6 +101,17 @@ public class MainActivity extends AppCompatActivity {
 //        photoCollection.WritePhotoCollection(this);
 //        PhotoCollection a = PhotoCollection.ReadPhotoCollection(this);
 //    }
+    public Context getContextMainActivity() {
+        return this;
+    }
+
+    public static PhotoCollection getPhotoCollection() {
+        return photos;
+    }
+
+    public static File getPhotoGalleryDir() {
+        return photoGalleryDir;
+    }
 
     public static void updatePhoto(String photoId, @Nullable String name, @Nullable String descryption, @Nullable List<String> tags) {
         Photo photo = photos.getPhotoFromId(photoId);
@@ -114,12 +128,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void updatePhoto(String photoId, String name) {
-        updatePhoto(photoId, name, null, null);
-    }
-
-    public static void updatePhoto(String photoId, String name, String descryption) {
-        updatePhoto(photoId, name, descryption, null);
+    public void writePhotoCollection() {
+        photos.WritePhotoCollection(this);
     }
 
     private void checkManageExternalStoragePermission() {

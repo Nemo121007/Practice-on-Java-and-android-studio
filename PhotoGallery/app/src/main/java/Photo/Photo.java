@@ -21,10 +21,16 @@ public class Photo implements Serializable {
     private Set<String> Tags;
 
     public Photo(@NonNull String id) {
-        Id = id;
+        Id = Photo.GeneratorId(id);
         Name = "";
         Description = "";
         Tags = new HashSet<>();
+    }
+
+    @NonNull
+    public static String GeneratorId(@NonNull String name){
+        Integer i = name.lastIndexOf('/');
+        return name.substring( i + 1); // +1 чтобы не включать сам символ '/'
     }
 
     public String getId() {
@@ -33,10 +39,6 @@ public class Photo implements Serializable {
 
     public String getName() {
         return Name;
-    }
-
-    public String getPath(){
-        return getId();
     }
 
     public void setName(String name) {

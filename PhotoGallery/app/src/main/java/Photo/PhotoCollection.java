@@ -205,10 +205,12 @@ public class PhotoCollection implements Serializable {
         if (photoCollection != null) {
             List<Photo> photos = photoCollection.getPhotoCollection(); // Получаем список фотографий
             Iterator<Photo> iterator = photos.iterator();
+
+            File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File photoGalleryDir = new File(picturesDir, "PhotoGallery");
             while (iterator.hasNext()) {
                 Photo photo = iterator.next();
-                // TODO: Удаляет записанные файлы
-                File file = new File(context.getExternalFilesDir(null), photo.getPath()); // Используем context
+                File file = new File(photoGalleryDir, Photo.GeneratorId(photo.getId()));
                 if (!file.exists()) {
                     iterator.remove(); // Безопасное удаление с помощью итератора
                 }
@@ -228,10 +230,9 @@ public class PhotoCollection implements Serializable {
             File[] imageFiles = photoGalleryDir.listFiles();
 
             if (imageFiles != null && imageFiles.length > 0) {
-
-                // Добавbnm все пути к файлам в список, если они еще не добавлены
+                // Добавляем все пути к файлам в список, если они еще не добавлены
                 for (File imageFile : imageFiles) {
-                    String path = imageFile.getAbsolutePath().toString();
+                    String path = Photo.GeneratorId(imageFile.getAbsolutePath());
                     if (this.getPhotoFromId(path) == null) {
                         // Если файл еще не добавлен, добавьте его в список
                         this.addPhoto(new Photo(path));
