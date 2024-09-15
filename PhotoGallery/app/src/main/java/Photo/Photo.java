@@ -57,12 +57,14 @@ public class Photo implements Serializable {
         return new ArrayList<>(Tags);
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(HashSet<String> tags) {
         Tags = new HashSet<>(tags);
     }
 
     public void addTag(String tag) {
-        Tags.add(tag);
+        if (!Tags.contains(tag)) {
+            Tags.add(tag);
+        }
     }
 
     public void removeTag(String tag) {

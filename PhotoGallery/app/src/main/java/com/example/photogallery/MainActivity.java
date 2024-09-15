@@ -23,6 +23,7 @@ import Photo.Photo;
 import android.Manifest;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         return photoGalleryDir;
     }
 
-    public static void updatePhoto(String photoId, @Nullable String name, @Nullable String descryption, @Nullable List<String> tags) {
+    public static void updatePhoto(String photoId, @Nullable String name, @Nullable String descryption, @Nullable HashSet<String> tags) {
         Photo photo = photos.getPhotoFromId(photoId);
         if (photo != null) {
             if (name != null) {
