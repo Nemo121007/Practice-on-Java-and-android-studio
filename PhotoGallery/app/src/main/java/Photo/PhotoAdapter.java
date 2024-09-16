@@ -31,6 +31,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         }
     }
 
+    public void updateData(List<Photo> newPhotos) {
+        this.photos = newPhotos; // Обновление списка фотографий
+    }
+
     public static class PhotoViewHolder extends RecyclerView.ViewHolder {
         public ImageView imageView;
 

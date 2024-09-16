@@ -42,10 +42,29 @@ public class MainActivity extends AppCompatActivity {
     private static final File photoGalleryDir = new File(Environment
             .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "PhotoGallery");
 
+    CameraHelper cameraHelper;
+    PermissionHelper permissionHelper;
+
     private static final int REQUEST_CODE = 1; // Код запроса для READ_EXTERNAL_STORAGE
     private static final int REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 2; // Код запроса для MANAGE_EXTERNAL_STORAGE
     private static final int CAMERA_REQUEST_IMAGE_CAPTURE = 2; // Измененный код запроса
     private static final int CAMERA_REQUEST_PERMISSION_CODE = 200; // Измененный код запроса
+
+    public static int getREQUEST_CODE() {
+        return REQUEST_CODE;
+    }
+
+    public static int getREQUEST_CODE_MANAGE_EXTERNAL_STORAGE() {
+        return REQUEST_CODE_MANAGE_EXTERNAL_STORAGE;
+    }
+
+    public static int getCAMERA_REQUEST_IMAGE_CAPTURE(){
+        return CAMERA_REQUEST_IMAGE_CAPTURE;
+    }
+
+    public static int getCAMERA_REQUEST_PERMISSION_CODE(){
+        return CAMERA_REQUEST_PERMISSION_CODE;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,15 +76,14 @@ public class MainActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.imageSearchButton);
 
         recyclerView = findViewById(R.id.recyclerView);
+
+        cameraHelper = new CameraHelper(this);
+        permissionHelper = new PermissionHelper(this);
         //endregion
 
         // region Обработка нажатий на кнопки
         cameraButton.setOnClickListener(v -> {
-            if (cameraCheckCameraPermission()) {
-                cameraDispatchTakePictureIntent();
-            } else {
-                cameraRequestCameraPermission();
-            }
+            cameraHelper.handleCameraButtonClick();
         });
 
         searchButton.setOnClickListener(v -> {
@@ -140,128 +158,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void writePhotoCollection() {
-        photos.WritePhotoCollection(this);
-    }
+    public void updateRecyclerView() {
+        // Получение адаптера RecyclerView
+        PhotoAdapter adapter = (PhotoAdapter) recyclerView.getAdapter();
 
-    // region Работа с разрешениями на чтение и запись
-    private void checkManageExternalStoragePermission() {
-        if (!Environment.isExternalStorageManager()) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivityForResult(intent, REQUEST_CODE_MANAGE_EXTERNAL_STORAGE);
-        }
+        // Обновление данных адаптера
+        adapter.updateData(photos.getPhotoCollection());
+
+        // Уведомление адаптера об изменениях
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Разрешения на память
-        if (requestCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkManageExternalStoragePermission();
-            } else {
-                finish();
-            }
-        }
 
-        // Разрешения на камеру
-        if (requestCode == CAMERA_REQUEST_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                cameraDispatchTakePictureIntent();
-            } else {
-                Toast.makeText(this, "Разрешение на камеру отклонено", Toast.LENGTH_SHORT).show();
-            }
-        }
+        permissionHelper.handlePermissionResult(requestCode, permissions, grantResults);
+
+        cameraHelper.handleCameraPermissionResult(requestCode, permissions, grantResults);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_MANAGE_EXTERNAL_STORAGE) {
-            if (!Environment.isExternalStorageManager()) {
-                finish();
-            }
-        }
 
-        // Работа с камерой
-        if (requestCode == CAMERA_REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
-            if (imageBitmap != null) {
-                saveImageToExternalStorage(imageBitmap);
-            }
-        }
+        permissionHelper.handleActivityResult(requestCode, resultCode, data);
+
+        cameraHelper.handleActivityResult(requestCode, resultCode, data);
     }
-    // endregion
-
-    // region Работа с камерой
-    private boolean cameraCheckCameraPermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void cameraRequestCameraPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_PERMISSION_CODE);
-    }
-
-    private void cameraDispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, CAMERA_REQUEST_IMAGE_CAPTURE);
-        }
-    }
-    // endregion
-
-    // region Сохранение фотографии
-    private void saveImageToExternalStorage(Bitmap imageBitmap) {
-        if (isExternalStorageWritable()) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Обработка ошибки создания файла
-                Toast.makeText(this, "Ошибка создания файла", Toast.LENGTH_SHORT).show();
-            }
-            // TODO: Проверить
-            if (photoFile != null) {
-                try (FileOutputStream out = new FileOutputStream(photoFile)) {
-                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                    // Обновление списка фотографий
-                    photos.addPhoto(new Photo(photoFile.getName()));
-                    photos.WritePhotoCollection(this);
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                } catch (IOException e) {
-                    // Обработка ошибки сохранения файла
-                    Toast.makeText(this, "Ошибка сохранения файла", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } else {
-            // Внешнее хранилище недоступно для записи
-            Toast.makeText(this, "Внешнее хранилище недоступно", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @NonNull
-    private File createImageFile() throws IOException {
-        // Создание уникального имени файла
-        long currentTime = System.currentTimeMillis();
-        String timeStamp = new Date(currentTime).toString();
-        String imageFileName = timeStamp.hashCode() + ".png"; // Изменено расширение на .png
-
-        while (photos.getPhotoFromId(imageFileName) != null){
-            imageFileName = imageFileName.hashCode() + ".png";
-        }
-
-        File image = new File(photoGalleryDir, imageFileName); // Создание файла с именем imageFileName
-        return image;
-    }
-
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(state);
-    }
-    // endregion
 
     @Override
     protected void onDestroy(){

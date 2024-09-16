@@ -14,64 +14,91 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import kotlin.jvm.Transient;
 
+/**
+ * Класс, представляющий коллекцию фотографий.
+ * Хранит фотографии в виде {@code LinkedHashMap}, где ключом является идентификатор фотографии,
+ * а значением - объект {@code Photo}.
+ * Обеспечивает методы для добавления, удаления, поиска и сериализации фотографий.
+ *
+ * @author Nemo121007
+ * @version 1.0
+ * @since 2024-09-16
+ */
 public class PhotoCollection implements Serializable {
+    /**
+     * Коллекция фотографий, хранящаяся в виде {@code LinkedHashMap}.
+     */
     @Expose
     private LinkedHashMap<String, Photo> photos;
 
-    @Transient // Исключаем из сериализации
+    /**
+     * Список идентификаторов фотографий для итерации.
+     * Исключается из сериализации.
+     */
+    @Transient
     private List<String> listPhotoId;
+
+    /**
+     * Индекс текущей фотографии при итерации.
+     * Исключается из сериализации.
+     */
     @Transient
     private Integer index;
 
+    /**
+     * Конструктор по умолчанию.
+     * Создает пустую коллекцию фотографий.
+     */
     public PhotoCollection() {
         photos = new LinkedHashMap<>();
     }
 
+    /**
+     * Конструктор, принимающий массив фотографий.
+     * Создает коллекцию и добавляет в нее фотографии из массива.
+     *
+     * @param photos Массив фотографий для добавления в коллекцию.
+     */
     public PhotoCollection(@NonNull Photo... photos) {
         this();
         addPhotos(photos);
     }
 
+    /**
+     * Конструктор, принимающий список фотографий.
+     * Создает коллекцию и добавляет в нее фотографии из списка.
+     *
+     * @param photos Список фотографий для добавления в коллекцию.
+     */
     public PhotoCollection(@NonNull List<Photo> photos) {
         this();
         addPhotos(photos);
     }
 
-    public void addPhoto(@NonNull Photo photo)
-    {
+    /**
+     * Добавляет фотографию в коллекцию, если ее идентификатор еще не существует.
+     *
+     * @param photo Фотография для добавления.
+     */
+    public void addPhoto(@NonNull Photo photo) {
         if (!photos.containsKey(photo.getId())){
             photos.put(photo.getId(), photo);
         }
-//        else {
-//            String newId = Integer.valueOf(photo.getId().hashCode()).toString();
-//            while (photos.containsKey(newId)){
-//                newId = Integer.valueOf(newId.hashCode()).toString();
-//            }
-//
-//            // Рефлексия типов!!!
-//            try {
-//                Field idField = Photo.class.getDeclaredField("Id");
-//                idField.setAccessible(true);
-//                idField.set(photo, newId);
-//                photos.put(newId, photo);
-//            } catch (NoSuchFieldException | IllegalAccessException e) {
-//                e.printStackTrace();
-//                // Обработка ошибок
-//            }
-//        }
     }
 
-    public void addPhotos(@NonNull Photo ... photos)
-    {
+    /**
+     * Добавляет массив фотографий в коллекцию.
+     *
+     * @param photos Массив фотографий для добавления.
+     */
+    public void addPhotos(@NonNull Photo ... photos) {
         for (Photo photo : photos){
             if (photo != null){
                 addPhoto(photo);
@@ -79,8 +106,12 @@ public class PhotoCollection implements Serializable {
         }
     }
 
-    public void addPhotos(@NonNull List<Photo> photos)
-    {
+    /**
+     * Добавляет список фотографий в коллекцию.
+     *
+     * @param photos Список фотографий для добавления.
+     */
+    public void addPhotos(@NonNull List<Photo> photos) {
         for (Photo photo : photos){
             if (photo != null){
                 addPhoto(photo);
@@ -88,22 +119,46 @@ public class PhotoCollection implements Serializable {
         }
     }
 
+    /**
+     * Удаляет фотографию из коллекции по объекту фотографии.
+     *
+     * @param photo Фотография для удаления.
+     */
     public void removePhoto(@NonNull Photo photo) {
         photos.remove(photo.getId());
     }
 
+    /**
+     * Удаляет фотографию из коллекции по идентификатору.
+     *
+     * @param photoId Идентификатор фотографии для удаления.
+     */
     public void removePhoto(String photoId) {
         photos.remove(photoId);
     }
 
+    /**
+     * Очищает коллекцию фотографий.
+     */
     public void clear(){
         photos.clear();
     }
 
+    /**
+     * Возвращает список всех фотографий в коллекции.
+     *
+     * @return Список фотографий.
+     */
     public List<Photo> getPhotoCollection() {
         return new ArrayList<>(photos.values());
     }
 
+    /**
+     * Возвращает фотографию по ее идентификатору.
+     *
+     * @param id Идентификатор фотографии.
+     * @return Фотография с заданным идентификатором или {@code null}, если фотография не найдена.
+     */
     public Photo getPhotoFromId(String id) {
         if (!photos.containsKey(id)){
             return null;
@@ -111,6 +166,12 @@ public class PhotoCollection implements Serializable {
         return photos.get(id);
     }
 
+    /**
+     * Возвращает список фотографий с заданным именем.
+     *
+     * @param name Имя фотографии.
+     * @return Список фотографий с заданным именем.
+     */
     public List<Photo> getPhotoFromName(String name) {
         List<Photo> result = new ArrayList<>();
         for (Photo photo : photos.values()) {
@@ -121,6 +182,12 @@ public class PhotoCollection implements Serializable {
         return result;
     }
 
+    /**
+     * Возвращает список фотографий, описание которых содержит заданную подстроку.
+     *
+     * @param descryption Подстрока для поиска в описании.
+     * @return Список фотографий, описание которых содержит заданную подстроку.
+     */
     public List<Photo> getPhotoFromDescryption(String descryption) {
         List<Photo> result = new ArrayList<>();
         for (Photo photo : photos.values()) {
@@ -131,6 +198,12 @@ public class PhotoCollection implements Serializable {
         return result;
     }
 
+    /**
+     * Возвращает список фотографий, имеющих заданный тег.
+     *
+     * @param tag Тег для поиска.
+     * @return Список фотографий, имеющих заданный тег.
+     */
     public List<Photo> getPhotoFromTag(String tag) {
         List<Photo> result = new ArrayList<>();
         for (Photo photo : photos.values()) {
@@ -141,16 +214,20 @@ public class PhotoCollection implements Serializable {
         return result;
     }
 
+    /**
+     * Возвращает следующую фотографию в коллекции.
+     * Использует внутренний список идентификаторов для итерации.
+     *
+     * @return Следующая фотография или {@code null}, если достигнут конец коллекции.
+     */
     public Photo next() {
-        if (listPhotoId.equals(null)){
+        if (listPhotoId == null){
             listPhotoId = new ArrayList<>(photos.keySet());
             index = 0;
-        }
-        else {
+        } else {
             if (index == listPhotoId.size()){
                 index = 0;
-            }
-            else {
+            } else {
                 index++;
             }
             return photos.get(listPhotoId.get(index));
@@ -158,16 +235,20 @@ public class PhotoCollection implements Serializable {
         return null;
     }
 
+    /**
+     * Возвращает предыдущую фотографию в коллекции.
+     * Использует внутренний список идентификаторов для итерации.
+     *
+     * @return Предыдущая фотография или {@code null}, если достигнут начало коллекции.
+     */
     public Photo past(){
-        if (listPhotoId.equals(null)){
+        if (listPhotoId == null){
             listPhotoId = new ArrayList<>(photos.keySet());
             index = 0;
-        }
-        else {
+        } else {
             if (index == -1){
                 index = listPhotoId.size() - 1;
-            }
-            else {
+            } else {
                 index--;
             }
             return photos.get(listPhotoId.get(index));
@@ -175,8 +256,13 @@ public class PhotoCollection implements Serializable {
         return null;
     }
 
+    /**
+     * Сохраняет коллекцию фотографий в JSON файл во внутренней памяти устройства.
+     *
+     * @param context Контекст приложения.
+     */
     public void WritePhotoCollection(@NonNull Context context) {
-        File internalStorageDir = context.getFilesDir(); // Используйте context
+        File internalStorageDir = context.getFilesDir();
         File myFile = new File(internalStorageDir, "dataPhotoCollection.json");
 
         try (FileWriter writer = new FileWriter(myFile)) {
@@ -184,7 +270,7 @@ public class PhotoCollection implements Serializable {
             String jsonString = gson.toJson(this);
             writer.write(jsonString);
         } catch (IOException e) {
-            e.printStackTrace(); // Обработка IOException
+            e.printStackTrace();
         }
     }
 
