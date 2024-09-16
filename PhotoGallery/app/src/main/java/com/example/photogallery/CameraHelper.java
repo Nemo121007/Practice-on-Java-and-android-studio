@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.UUID;
 
 import Photo.Photo;
 import Photo.PhotoCollection;
@@ -29,6 +30,7 @@ class CameraHelper {
 
     CameraHelper(Activity activity) {
         this.activity = activity;
+        photos = MainActivity.getPhotoCollection();
     }
 
     private boolean cameraCheckCameraPermission() {
@@ -86,9 +88,10 @@ class CameraHelper {
             // TODO: Проверить
             if (photoFile != null) {
                 try (FileOutputStream out = new FileOutputStream(photoFile)) {
-                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                     // Обновление списка фотографий
-                    photos.addPhoto(new Photo(photoFile.getName()));
+                    Photo photo = new Photo(Photo.GeneratorId(photoFile.getAbsolutePath()));
+                    photos.addPhoto(photo);
                     photos.WritePhotoCollection(activity);
                 } catch (IOException e) {
                     // Обработка ошибки сохранения файла
@@ -104,13 +107,12 @@ class CameraHelper {
     @NonNull
     private File createImageFile() throws IOException {
         // Создание уникального имени файла
-        long currentTime = System.currentTimeMillis();
-        String timeStamp = new Date(currentTime).toString();
-        String imageFileName = timeStamp.hashCode() + ".png"; // Изменено расширение на .png
-
-        while (photos.getPhotoFromId(imageFileName) != null){
-            imageFileName = imageFileName.hashCode() + ".png";
-        }
+        String imageFileName = UUID.randomUUID().toString() + ".png";
+        File imageFile = new File(photoGalleryDir, imageFileName);
+        while (imageFile.exists()) {
+            imageFileName = UUID.randomUUID().toString() + ".png";
+            imageFile = new File(photoGalleryDir, imageFileName);
+        }  imageFile = new File(photoGalleryDir, imageFileName);
 
         File image = new File(photoGalleryDir, imageFileName); // Создание файла с именем imageFileName
         return image;

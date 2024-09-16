@@ -2,10 +2,12 @@ package Photo;
 
 import android.content.Context;
 import android.os.Environment;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.photogallery.MainActivity;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 
@@ -125,7 +127,7 @@ public class PhotoCollection implements Serializable {
      * @param photo Фотография для удаления.
      */
     public void removePhoto(@NonNull Photo photo) {
-        photos.remove(photo.getId());
+        removePhoto(photo.getId());
     }
 
     /**
@@ -135,6 +137,11 @@ public class PhotoCollection implements Serializable {
      */
     public void removePhoto(String photoId) {
         photos.remove(photoId);
+
+        File path = new File(MainActivity.getPhotoGalleryDir(), photoId);
+        if (path.exists()) {
+            path.delete();
+        }
     }
 
     /**
@@ -220,19 +227,17 @@ public class PhotoCollection implements Serializable {
      *
      * @return Следующая фотография или {@code null}, если достигнут конец коллекции.
      */
-    public Photo next() {
+    public Photo next(String photoId) {
         if (listPhotoId == null){
             listPhotoId = new ArrayList<>(photos.keySet());
+            index = listPhotoId.indexOf(photoId);
+        }
+        if (index == listPhotoId.size() - 1){
             index = 0;
         } else {
-            if (index == listPhotoId.size()){
-                index = 0;
-            } else {
-                index++;
-            }
-            return photos.get(listPhotoId.get(index));
+            index++;
         }
-        return null;
+        return photos.get(listPhotoId.get(index));
     }
 
     /**
@@ -246,7 +251,7 @@ public class PhotoCollection implements Serializable {
             listPhotoId = new ArrayList<>(photos.keySet());
             index = 0;
         } else {
-            if (index == -1){
+            if (index == 0){
                 index = listPhotoId.size() - 1;
             } else {
                 index--;
@@ -274,12 +279,22 @@ public class PhotoCollection implements Serializable {
         }
     }
 
+    /**
+     * Читает коллекцию фотографий из JSON файла во внутренней памяти устройства.
+     * В случае успешного чтения, проверяет наличие соответствующих файлов фотографий
+     * в директории "PhotoGallery" на внешнем хранилище.
+     * Если файл фотографии не найден, запись о нем удаляется из коллекции.
+     * После этого вызывает метод {@code ReadFileOnDevice()} для добавления
+     * новых фотографий из директории в коллекцию.
+     * @param context Контекст приложения.
+     * @return Коллекция фотографий, прочитанная из файла, или {@code null} в случае ошибки.
+     */
     @Nullable
     public static PhotoCollection ReadPhotoCollection(@NonNull Context context) {
         File internalStorageDir = context.getFilesDir();
         File myFile = new File(internalStorageDir, "dataPhotoCollection.json");
 
-        PhotoCollection photoCollection = null; // Инициализируем null
+        PhotoCollection photoCollection = null;
         try (FileReader reader = new FileReader(myFile)) {
             Gson gson = new Gson();
             photoCollection = gson.fromJson(reader, PhotoCollection.class);
@@ -289,7 +304,7 @@ public class PhotoCollection implements Serializable {
         }
 
         if (photoCollection != null) {
-            List<Photo> photos = photoCollection.getPhotoCollection(); // Получаем список фотографий
+            List<Photo> photos = photoCollection.getPhotoCollection();
             Iterator<Photo> iterator = photos.iterator();
 
             File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
@@ -298,7 +313,7 @@ public class PhotoCollection implements Serializable {
                 Photo photo = iterator.next();
                 File file = new File(photoGalleryDir, Photo.GeneratorId(photo.getId()));
                 if (!file.exists()) {
-                    iterator.remove(); // Безопасное удаление с помощью итератора
+                    iterator.remove();
                 }
             }
 
@@ -308,6 +323,11 @@ public class PhotoCollection implements Serializable {
         return photoCollection;
     }
 
+    /**
+     * Считывает файлы фотографий из директории "PhotoGallery" на внешнем хранилище
+     * и добавляет их в коллекцию, если они еще не присутствуют.
+     * Если директория "PhotoGallery" не существует, создает ее.
+     */
     public void ReadFileOnDevice(){
         File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File photoGalleryDir = new File(picturesDir, "PhotoGallery");
@@ -316,11 +336,9 @@ public class PhotoCollection implements Serializable {
             File[] imageFiles = photoGalleryDir.listFiles();
 
             if (imageFiles != null && imageFiles.length > 0) {
-                // Добавляем все пути к файлам в список, если они еще не добавлены
                 for (File imageFile : imageFiles) {
                     String path = Photo.GeneratorId(imageFile.getAbsolutePath());
                     if (this.getPhotoFromId(path) == null) {
-                        // Если файл еще не добавлен, добавьте его в список
                         this.addPhoto(new Photo(path));
                     }
                 }

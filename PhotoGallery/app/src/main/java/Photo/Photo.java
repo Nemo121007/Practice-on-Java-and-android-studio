@@ -23,7 +23,7 @@ public class Photo implements Serializable {
      * Идентификатор фотографии.
      */
     @Expose
-    private String Id;
+    private final String Id;
 
     /**
      * Имя фотографии.
@@ -66,7 +66,7 @@ public class Photo implements Serializable {
      */
     @NonNull
     public static String GeneratorId(@NonNull String name){
-        Integer i = name.lastIndexOf('/');
+        int i = name.lastIndexOf('/');
         return name.substring( i + 1); // +1 чтобы не включать сам символ '/'
     }
 
@@ -139,9 +139,7 @@ public class Photo implements Serializable {
      * @param tag Тег для добавления.
      */
     public void addTag(String tag) {
-        if (!Tags.contains(tag)) {
-            Tags.add(tag);
-        }
+        Tags.add(tag);
     }
 
     /**

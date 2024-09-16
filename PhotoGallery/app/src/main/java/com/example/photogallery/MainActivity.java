@@ -47,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 1; // Код запроса для READ_EXTERNAL_STORAGE
     private static final int REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 2; // Код запроса для MANAGE_EXTERNAL_STORAGE
-    private static final int CAMERA_REQUEST_IMAGE_CAPTURE = 2; // Измененный код запроса
-    private static final int CAMERA_REQUEST_PERMISSION_CODE = 200; // Измененный код запроса
+    private static final int CAMERA_REQUEST_IMAGE_CAPTURE = 3; // Измененный код запроса
+    private static final int CAMERA_REQUEST_PERMISSION_CODE = 4; // Измененный код запроса
+    private static final int REQUEST_CODE_PHOTO_VIEW = 5; // Код запроса для просмотра
 
     public static int getREQUEST_CODE() {
         return REQUEST_CODE;
@@ -66,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
         return CAMERA_REQUEST_PERMISSION_CODE;
     }
 
+    public static int getREQUEST_CODE_PHOTO_VIEW(){
+        return REQUEST_CODE_PHOTO_VIEW;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,9 +81,6 @@ public class MainActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.imageSearchButton);
 
         recyclerView = findViewById(R.id.recyclerView);
-
-        cameraHelper = new CameraHelper(this);
-        permissionHelper = new PermissionHelper(this);
         //endregion
 
         // region Обработка нажатий на кнопки
@@ -118,10 +120,13 @@ public class MainActivity extends AppCompatActivity {
             Photo photo = photos.getPhotoCollection().get(position);
             Intent intent = new Intent(MainActivity.this, PhotoActivity.class);
             intent.putExtra("photoId", photo.getId());
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_CODE_PHOTO_VIEW);
         });
 
         recyclerView.setAdapter(adapter);
+
+        cameraHelper = new CameraHelper(this);
+        permissionHelper = new PermissionHelper(this);
         // endregion
     }
 
@@ -185,6 +190,8 @@ public class MainActivity extends AppCompatActivity {
         permissionHelper.handleActivityResult(requestCode, resultCode, data);
 
         cameraHelper.handleActivityResult(requestCode, resultCode, data);
+
+        updateRecyclerView();
     }
 
     @Override

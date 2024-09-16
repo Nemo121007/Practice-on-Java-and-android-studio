@@ -2,6 +2,7 @@ package com.example.photogallery;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -57,50 +58,115 @@ public class PhotoActivity extends AppCompatActivity {
 
         // region Обработка нажатий кнопок
         backButton.setOnClickListener(v -> {
+            savePhotoCollection();
             finish();
         });
 
         deleteButton.setOnClickListener(v -> {
-            // TODO: Обработать удаление
+            photoCollection.removePhoto(photo);
+            photoCollection.WritePhotoCollection(this);
+            setResult(MainActivity.getREQUEST_CODE_PHOTO_VIEW());
             finish();
         });
 
         imageButtonNext.setOnClickListener(v -> {
-            //showNextData();
+            showNextData();
         });
 
         imageButtonPast.setOnClickListener(v -> {
-            //showPreviousData();
+            showPastData();
         });
 
         plusButton.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Введите тег");
-
-            final EditText input = new EditText(this);
-            builder.setView(input);
-
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String enteredText = input.getText().toString();
-                    addTag(enteredText);
-                }
-            });
-            builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-            builder.show();
+            showAddTag();
         });
         // endregion
 
         photo = photoCollection.getPhotoFromId((String) getIntent().getSerializableExtra("photoId"));
 
         // region Загрузка изображений
+        // Создайте URI из пути к файлу
+
+//        File imageFile = new File(MainActivity.getPhotoGalleryDir(), photo.getId());
+//        Uri imageUri = Uri.fromFile(imageFile);
+//
+//        // Загрузите изображение в ImageView с помощью Glide
+//        Glide.with(this)
+//                .load(imageUri)
+//                .placeholder(R.drawable.question) // изображение-заполнитель
+//                .error(R.drawable.question) // изображение при ошибке
+//                .into(image);
+        updateFields();
+
+        GestureDetector gestureDetector = new GestureDetector(this, new MyGestureListener());
+        image.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+        // endregion
+
+    }
+
+    //
+    private void addTag(String tag) {
+        photo.getTags().add(tag);
+        photoCollection.getPhotoFromId(photo.getId()).addTag(tag);
+        Chip chip = (Chip) inflater.inflate(R.layout.chip_template, tagContainer, false);
+        chip.setText(tag);
+        chip.setOnCloseIconClickListener(v -> {
+            photoCollection.getPhotoFromId(photo.getId()).removeTag(tag);
+            tagContainer.removeView(chip);
+            savePhotoCollection();
+        });
+        tagContainer.addView(chip);
+    }
+
+    private void showAddTag(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Введите тег");
+
+        final EditText input = new EditText(this);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { // Устанавливаем кнопки до create()
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String enteredText = input.getText().toString();
+                addTag(enteredText);
+            }
+        });
+        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                input.requestFocus();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void showPastData() {
+        // Логика для получения предыдущего набора данных
+        // и обновления полей: editNameText, editTextDescryption, tagContainer
+        savePhotoCollection();
+        photo = photoCollection.past(); //  ваш метод для получения предыдущего фото
+        updateFields();
+    }
+
+    private void showNextData() {
+        // Логика для получения следующего набора данных
+        // и обновления полей: editNameText, editTextDescryption, tagContainer
+        savePhotoCollection();
+        photo = photoCollection.next(photo.getId()); //  ваш метод для получения следующего фото
+        updateFields();
+    }
+
+    private void updateFields() {
         // Создайте URI из пути к файлу
         File imageFile = new File(MainActivity.getPhotoGalleryDir(), photo.getId());
         Uri imageUri = Uri.fromFile(imageFile);
@@ -112,51 +178,12 @@ public class PhotoActivity extends AppCompatActivity {
                 .error(R.drawable.question) // изображение при ошибке
                 .into(image);
 
-        GestureDetector gestureDetector = new GestureDetector(this, new MyGestureListener());
-        image.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-        // endregion
-
-        editNameText.setText(photo.getName());
-        editTextDescryption.setText(photo.getDescryption());
-
+        editNameText.setText(photo.getName()); //  предполагается, что у Photo есть метод getName()
+        editTextDescryption.setText(photo.getDescryption()); // предполагается, что у Photo есть метод getDescription()
+        tagContainer.removeAllViews();
         for (String tag : photo.getTags()) {
             addTag(tag);
         }
-    }
-
-    private void addTag(String tag) {
-        photo.getTags().add(tag);
-        photoCollection.getPhotoFromId(photo.getId()).addTag(tag);
-        Chip chip = (Chip) inflater.inflate(R.layout.chip_template, tagContainer, false);
-        chip.setText(tag);
-        chip.setOnCloseIconClickListener(v -> {
-            // TODO: Обработать удаление
-        });
-        tagContainer.addView(chip);
-    }
-
-    private void showPreviousData() {
-        // Логика для получения предыдущего набора данных
-        // и обновления полей: editNameText, editTextDescryption, tagContainer
-        Photo previousPhoto = photoCollection.past(); //  ваш метод для получения предыдущего фото
-        if (previousPhoto != null) {
-            updateFields(previousPhoto);
-        }
-    }
-
-    private void showNextData() {
-        // Логика для получения следующего набора данных
-        // и обновления полей: editNameText, editTextDescryption, tagContainer
-        Photo nextPhoto = photoCollection.next(); //  ваш метод для получения следующего фото
-        if (nextPhoto != null) {
-            updateFields(nextPhoto);
-        }
-    }
-
-    private void updateFields(@NonNull Photo photo) {
-        editNameText.setText(photo.getName()); //  предполагается, что у Photo есть метод getName()
-        editTextDescryption.setText(photo.getDescryption()); // предполагается, что у Photo есть метод getDescription()
-        //  обновление tagContainer в зависимости от тегов фото
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -165,7 +192,7 @@ public class PhotoActivity extends AppCompatActivity {
             if (Math.abs(velocityX) > Math.abs(velocityY)) {
                 if (velocityX > 0) {
                     // Свайп вправо - показать предыдущий набор данных
-                    showPreviousData();
+                    showPastData();
                 } else {
                     // Свайп влево - показать следующий набор данных
                     showNextData();
@@ -198,7 +225,7 @@ public class PhotoActivity extends AppCompatActivity {
                 tags.add(chip.getText().toString());
             }
         }
-        if (!tags.equals(photo.getTags())){
+        if (!photo.getTags().equals(tags)){
             MainActivity.updatePhoto(photo.getId(), null, null, tags);
         }
 
