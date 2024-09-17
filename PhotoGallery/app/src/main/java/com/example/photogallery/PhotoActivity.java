@@ -34,8 +34,10 @@ public class PhotoActivity extends AppCompatActivity {
     EditText editNameText, editTextDescryption;
     ChipGroup tagContainer;
     Photo photo;
-    PhotoCollection photoCollection = MainActivity.getPhotoCollection();
+    PhotoCollection photoCollectionFromMain, filterPhotoCollection, photoCollection;
     LayoutInflater inflater;
+
+    private int requestCode;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -43,6 +45,21 @@ public class PhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
         inflater = LayoutInflater.from(this);
+        requestCode = getIntent().getIntExtra("REQUEST_CODE", MainActivity.getREQUEST_CODE_PHOTO_VIEW());
+
+        photoCollectionFromMain = MainActivity.getPhotoCollection();
+
+        if (requestCode == MainActivity.getREQUEST_CODE_SEARCH_PHOTO_VIEW()){
+            filterPhotoCollection = SearchActivity.getPhotoCollectionFilter();
+        } else {
+            filterPhotoCollection = null;
+        }
+
+        if (filterPhotoCollection != null) {
+            photoCollection = filterPhotoCollection;
+        } else {
+            photoCollection = photoCollectionFromMain;
+        }
 
         // region Инициализация объектов
         backButton = findViewById(R.id.imageBackButton);
@@ -63,8 +80,11 @@ public class PhotoActivity extends AppCompatActivity {
         });
 
         deleteButton.setOnClickListener(v -> {
-            photoCollection.removePhoto(photo);
-            photoCollection.WritePhotoCollection(this);
+            if (filterPhotoCollection != null) {
+                filterPhotoCollection.removePhoto(photo);
+            }
+            photoCollectionFromMain.removePhoto(photo);
+            photoCollectionFromMain.WritePhotoCollection(this);
             setResult(MainActivity.getREQUEST_CODE_PHOTO_VIEW());
             finish();
         });
@@ -84,34 +104,26 @@ public class PhotoActivity extends AppCompatActivity {
 
         photo = photoCollection.getPhotoFromId((String) getIntent().getSerializableExtra("photoId"));
 
-        // region Загрузка изображений
-        // Создайте URI из пути к файлу
-
-//        File imageFile = new File(MainActivity.getPhotoGalleryDir(), photo.getId());
-//        Uri imageUri = Uri.fromFile(imageFile);
-//
-//        // Загрузите изображение в ImageView с помощью Glide
-//        Glide.with(this)
-//                .load(imageUri)
-//                .placeholder(R.drawable.question) // изображение-заполнитель
-//                .error(R.drawable.question) // изображение при ошибке
-//                .into(image);
         updateFields();
 
         GestureDetector gestureDetector = new GestureDetector(this, new MyGestureListener());
         image.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-        // endregion
-
     }
 
     //
     private void addTag(String tag) {
         photo.getTags().add(tag);
-        photoCollection.getPhotoFromId(photo.getId()).addTag(tag);
+        if (filterPhotoCollection != null){
+            filterPhotoCollection.getPhotoFromId(photo.getId()).addTag(tag);
+        }
+        photoCollectionFromMain.getPhotoFromId(photo.getId()).addTag(tag);
         Chip chip = (Chip) inflater.inflate(R.layout.chip_template, tagContainer, false);
         chip.setText(tag);
         chip.setOnCloseIconClickListener(v -> {
-            photoCollection.getPhotoFromId(photo.getId()).removeTag(tag);
+            if (filterPhotoCollection != null){
+                filterPhotoCollection.getPhotoFromId(photo.getId()).removeTag(tag);
+            }
+            photoCollectionFromMain.getPhotoFromId(photo.getId()).removeTag(tag);
             tagContainer.removeView(chip);
             savePhotoCollection();
         });
@@ -229,6 +241,6 @@ public class PhotoActivity extends AppCompatActivity {
             MainActivity.updatePhoto(photo.getId(), null, null, tags);
         }
 
-        photoCollection.WritePhotoCollection(this);
+        photoCollectionFromMain.WritePhotoCollection(this);
     }
 }

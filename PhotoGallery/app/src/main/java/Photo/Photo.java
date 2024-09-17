@@ -97,6 +97,10 @@ public class Photo implements Serializable {
         Name = name;
     }
 
+    public boolean checkName(String subName){
+        return Name.contains(subName);
+    }
+
     /**
      * Возвращает описание фотографии.
      *
@@ -113,6 +117,10 @@ public class Photo implements Serializable {
      */
     public void setDescription(String description) {
         Description = description;
+    }
+
+    public boolean checkDescryption(String subDescryption){
+        return Description.contains(subDescryption);
     }
 
     /**
@@ -156,5 +164,14 @@ public class Photo implements Serializable {
      */
     public void clearTags() {
         Tags.clear();
+    }
+
+    public boolean checkTag(@NonNull HashSet<String> subTag) {
+        for (String tag : subTag) {
+            if (!Tags.contains(tag)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

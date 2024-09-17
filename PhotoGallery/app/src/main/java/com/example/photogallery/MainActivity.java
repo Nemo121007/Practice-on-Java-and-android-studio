@@ -1,16 +1,11 @@
 package com.example.photogallery;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.widget.ImageButton;
 
 
@@ -27,11 +22,8 @@ import Photo.PhotoCollection;
 import Photo.PhotoAdapter;
 import Photo.Photo;
 import android.Manifest;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashSet;
 
 
@@ -50,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST_IMAGE_CAPTURE = 3; // Измененный код запроса
     private static final int CAMERA_REQUEST_PERMISSION_CODE = 4; // Измененный код запроса
     private static final int REQUEST_CODE_PHOTO_VIEW = 5; // Код запроса для просмотра
+    private static final int REQUEST_CODE_SEARCH_PHOTO_VIEW = 6; // Код запроса для просмотра поиска
 
     public static int getREQUEST_CODE() {
         return REQUEST_CODE;
@@ -71,13 +64,17 @@ public class MainActivity extends AppCompatActivity {
         return REQUEST_CODE_PHOTO_VIEW;
     }
 
+    public static int getREQUEST_CODE_SEARCH_PHOTO_VIEW(){
+        return REQUEST_CODE_SEARCH_PHOTO_VIEW;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // region Инициализация объектов
-        cameraButton = findViewById(R.id.imageCameraButton);
+        cameraButton = findViewById(R.id.BackButton);
         searchButton = findViewById(R.id.imageSearchButton);
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -90,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         searchButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_CODE_PHOTO_VIEW);
         });
         // endregion
 

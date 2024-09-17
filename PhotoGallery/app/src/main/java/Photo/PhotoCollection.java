@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,15 +45,13 @@ public class PhotoCollection implements Serializable {
      * Список идентификаторов фотографий для итерации.
      * Исключается из сериализации.
      */
-    @Transient
-    private List<String> listPhotoId;
+    private transient List<String> listPhotoId;
 
     /**
      * Индекс текущей фотографии при итерации.
      * Исключается из сериализации.
      */
-    @Transient
-    private Integer index;
+    private transient Integer index;
 
     /**
      * Конструктор по умолчанию.
@@ -259,6 +258,24 @@ public class PhotoCollection implements Serializable {
             return photos.get(listPhotoId.get(index));
         }
         return null;
+    }
+
+    public PhotoCollection getFilterPhotoCollection(@Nullable String name, @Nullable String descryption, @Nullable HashSet<String> tags){
+        PhotoCollection result = new PhotoCollection();
+        for (Photo photo : photos.values()) {
+            if (name != null && name != "" && !photo.checkName(name)){
+                continue;
+            }
+            if (descryption != null && descryption != "" && !photo.checkDescryption(descryption)){
+                continue;
+            }
+            if (tags != null && !photo.checkTag(tags)) {
+                continue;
+            }
+            result.addPhoto(photo);
+        }
+
+        return result;
     }
 
     /**
